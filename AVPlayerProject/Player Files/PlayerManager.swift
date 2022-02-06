@@ -17,6 +17,7 @@ protocol PlayerManagerObservable: AnyObject {
     func managerDidFail(_ manager: PlayerManager, with error: Error?)
     func managerStatusUnknown(_ manager: PlayerManager)
     func managerFailedToLoadResource(message: String)
+    func managerPlaybackStateChanaged(_ manager: PlayerManager, isPlaying: Bool)
 }
 
 final class PlayerManager: NSObject {
@@ -45,12 +46,19 @@ final class PlayerManager: NSObject {
         }
     }
     
+    private(set) var isPlaying: Bool = false {
+        didSet {
+            delegate?.managerPlaybackStateChanaged(self, isPlaying: isPlaying)
+        }
+    }
+    
     private override init() {
         self.player = AVPlayer(playerItem: nil)
         
         super.init()
         
         player.addObserver(self, forKeyPath: #keyPath(AVPlayer.status), options: [.new], context: &playerContext)
+        player.addObserver(self, forKeyPath: #keyPath(AVPlayer.rate), options: [.new], context: &playerContext)
     }
     
     func loadInitialResource() {
@@ -101,6 +109,12 @@ fileprivate extension PlayerManager {
                 playerStatus = .unknown
             }
         }
+        if keyPath == #keyPath(AVPlayer.rate) {
+            if let val = change?[.newKey] as? NSNumber {
+                let rate = val.floatValue
+                isPlaying = rate != 0.0
+            }
+        }
     }
     
     func playerItemObservedValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?) {
@@ -115,16 +129,18 @@ fileprivate extension PlayerManager {
                 status = .unknown
             }
             
-            switch status {
-            case .readyToPlay:
-                print("Item is ready for playback")
-            case .failed:
-                print("Item No longer plays due to error")
-            case .unknown:
-                fallthrough
-            @unknown default:
-                print("Item status is unknown")
-            }
+            // un comment for monitor item status
+            
+//            switch status {
+//            case .readyToPlay:
+//                print("Item is ready for playback")
+//            case .failed:
+//                print("Item No longer plays due to error")
+//            case .unknown:
+//                fallthrough
+//            @unknown default:
+//                print("Item status is unknown")
+//            }
         }
     }
 }

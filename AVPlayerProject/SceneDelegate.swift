@@ -82,5 +82,9 @@ extension SceneDelegate: PlayerManagerObservable {
     func managerFailedToLoadResource(message: String) {
         print("Player Manager Failed To Load: \(message)")
     }
+    
+    func managerPlaybackStateChanaged(_ manager: PlayerManager, isPlaying: Bool) {
+        print("Player Manager Plaback Status: \(isPlaying ? "Playing" : "Stopped")")
+    }
 }
 

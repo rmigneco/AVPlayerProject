@@ -19,8 +19,6 @@ protocol PlayerManagerObservable: AnyObject {
     func managerFailedToLoadResource(message: String)
 }
 
-// TODO add some functions play/pause
-
 final class PlayerManager: NSObject {
     
     private var playerItemContext = PlaybackContext()
@@ -32,7 +30,7 @@ final class PlayerManager: NSObject {
     
     weak var delegate: PlayerManagerObservable?
     
-    private var playerStatus: AVPlayer.Status = .unknown {
+    private(set) var playerStatus: AVPlayer.Status = .unknown {
         didSet {
             switch playerStatus {
             case .readyToPlay:
@@ -66,7 +64,7 @@ final class PlayerManager: NSObject {
         item.addObserver(self, forKeyPath: #keyPath(AVPlayerItem.status), options: [.new], context: &playerItemContext)
     }
     
-    /// MARK: Playback controls
+    // MARK: Playback controls
     func play() {
         player.play()
     }
@@ -75,7 +73,7 @@ final class PlayerManager: NSObject {
         player.pause()
     }
     
-    /// MARK: KVO
+    // MARK: KVO
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         
         if context == &playerItemContext {
@@ -130,6 +128,3 @@ fileprivate extension PlayerManager {
         }
     }
 }
-
-
-// MARK: Observers

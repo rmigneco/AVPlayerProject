@@ -11,6 +11,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
 
+    let manager = PlayerManager.shared
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
@@ -22,6 +23,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window.rootViewController = ViewController()
         self.window = window
         window.makeKeyAndVisible()
+        
+        manager.delegate = self
+        manager.loadInitialResource()
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -39,11 +43,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneWillResignActive(_ scene: UIScene) {
         // Called when the scene will move from an active state to an inactive state.
         // This may occur due to temporary interruptions (ex. an incoming phone call).
+        
+        manager.pause()
     }
 
     func sceneWillEnterForeground(_ scene: UIScene) {
         // Called as the scene transitions from the background to the foreground.
         // Use this method to undo the changes made on entering the background.
+        
+        if manager.playerStatus == .readyToPlay {
+            manager.play()
+        }
     }
 
     func sceneDidEnterBackground(_ scene: UIScene) {
@@ -52,6 +62,25 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // to restore the scene back to its current state.
     }
 
+}
 
+extension SceneDelegate: PlayerManagerObservable {
+    
+    func managerIsReadyToPlay(_ manager: PlayerManager) {
+        print("Player Manager Status: Ready")
+        manager.play()
+    }
+    
+    func managerDidFail(_ manager: PlayerManager, with error: Error?) {
+        print("Player Manager Status- Failed with Error: \(String(describing: error))")
+    }
+    
+    func managerStatusUnknown(_ manager: PlayerManager) {
+        print("Player Manager Status: Unknown")
+    }
+    
+    func managerFailedToLoadResource(message: String) {
+        print("Player Manager Failed To Load: \(message)")
+    }
 }
 

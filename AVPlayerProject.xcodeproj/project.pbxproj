@@ -15,6 +15,7 @@
 		C7A4FF7227B04017006899DE /* AVPlayerProjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A4FF7127B04017006899DE /* AVPlayerProjectTests.swift */; };
 		C7A4FF7C27B04017006899DE /* AVPlayerProjectUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A4FF7B27B04017006899DE /* AVPlayerProjectUITests.swift */; };
 		C7A4FF7E27B04017006899DE /* AVPlayerProjectUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A4FF7D27B04017006899DE /* AVPlayerProjectUITestsLaunchTests.swift */; };
+		C7A4FF8C27B043EE006899DE /* PlayerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A4FF8B27B043EE006899DE /* PlayerManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +48,7 @@
 		C7A4FF7727B04017006899DE /* AVPlayerProjectUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AVPlayerProjectUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7A4FF7B27B04017006899DE /* AVPlayerProjectUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVPlayerProjectUITests.swift; sourceTree = "<group>"; };
 		C7A4FF7D27B04017006899DE /* AVPlayerProjectUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVPlayerProjectUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		C7A4FF8B27B043EE006899DE /* PlayerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,6 +99,7 @@
 		C7A4FF5927B04015006899DE /* AVPlayerProject */ = {
 			isa = PBXGroup;
 			children = (
+				C7A4FF8A27B043D1006899DE /* Player Files */,
 				C7A4FF5A27B04015006899DE /* AppDelegate.swift */,
 				C7A4FF5C27B04015006899DE /* SceneDelegate.swift */,
 				C7A4FF5E27B04015006899DE /* ViewController.swift */,
@@ -122,6 +125,14 @@
 				C7A4FF7D27B04017006899DE /* AVPlayerProjectUITestsLaunchTests.swift */,
 			);
 			path = AVPlayerProjectUITests;
+			sourceTree = "<group>";
+		};
+		C7A4FF8A27B043D1006899DE /* Player Files */ = {
+			isa = PBXGroup;
+			children = (
+				C7A4FF8B27B043EE006899DE /* PlayerManager.swift */,
+			);
+			path = "Player Files";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -256,6 +267,7 @@
 			files = (
 				C7A4FF5F27B04015006899DE /* ViewController.swift in Sources */,
 				C7A4FF5B27B04015006899DE /* AppDelegate.swift in Sources */,
+				C7A4FF8C27B043EE006899DE /* PlayerManager.swift in Sources */,
 				C7A4FF5D27B04015006899DE /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

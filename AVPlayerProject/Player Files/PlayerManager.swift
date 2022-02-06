@@ -16,9 +16,10 @@ protocol PlayerManagerObservable: AnyObject {
     func managerIsReadyToPlay(_ manager: PlayerManager)
     func managerDidFail(_ manager: PlayerManager, with error: Error?)
     func managerStatusUnknown(_ manager: PlayerManager)
+    func managerFailedToLoadResource(message: String)
 }
 
-// some functions play/pause
+// TODO add some functions play/pause
 
 final class PlayerManager: NSObject {
     
@@ -56,8 +57,7 @@ final class PlayerManager: NSObject {
     
     func loadInitialResource() {
         guard let url = URL(string: "https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8") else {
-            // TODO log error
-            print("Invalid URL")
+            delegate?.managerFailedToLoadResource(message: "Invalid URL")
             return
         }
         
@@ -66,7 +66,16 @@ final class PlayerManager: NSObject {
         item.addObserver(self, forKeyPath: #keyPath(AVPlayerItem.status), options: [.new], context: &playerItemContext)
     }
     
+    /// MARK: Playback controls
+    func play() {
+        player.play()
+    }
     
+    func pause() {
+        player.pause()
+    }
+    
+    /// MARK: KVO
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         
         if context == &playerItemContext {
@@ -108,12 +117,11 @@ fileprivate extension PlayerManager {
                 status = .unknown
             }
             
-            // TOO funnel into manager's state (current playerItemState)
             switch status {
             case .readyToPlay:
                 print("Item is ready for playback")
             case .failed:
-                print("No longer plays due to error")
+                print("Item No longer plays due to error")
             case .unknown:
                 fallthrough
             @unknown default:

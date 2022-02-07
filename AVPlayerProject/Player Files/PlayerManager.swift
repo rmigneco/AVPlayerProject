@@ -32,7 +32,6 @@ protocol PlayerManagerObservable: AnyObject {
 
 final class PlayerManager: NSObject {
     
-    private var playerItemContext = PlaybackContext()
     private var playerContext = PlaybackContext()
     
     private var timeObserverToken: Any?
@@ -93,7 +92,6 @@ final class PlayerManager: NSObject {
         
         let item = AVPlayerItem(url: url)
         player.replaceCurrentItem(with: item)
-        item.addObserver(self, forKeyPath: #keyPath(AVPlayerItem.status), options: [.new], context: &playerItemContext)
     }
     
     // MARK: Playback controls
@@ -108,10 +106,7 @@ final class PlayerManager: NSObject {
     // MARK: KVO
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         
-        if context == &playerItemContext {
-            playerItemObservedValue(forKeyPath: keyPath, of: object, change: change)
-        }
-        else if context == &playerContext {
+        if context == &playerContext {
             playerObservedValue(forKeyPath: keyPath, of: object, change: change)
         }
         else {
@@ -138,33 +133,6 @@ fileprivate extension PlayerManager {
                 let rate = val.floatValue
                 isPlaying = rate != 0.0
             }
-        }
-    }
-    
-    func playerItemObservedValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?) {
-        if keyPath == #keyPath(AVPlayerItem.status) {
-            let status: AVPlayerItem.Status
-            
-            if let val = change?[.newKey] as? NSNumber,
-             let newStatus = AVPlayerItem.Status(rawValue: val.intValue) {
-                status = newStatus
-            }
-            else {
-                status = .unknown
-            }
-            
-            // un comment for monitor item status
-            
-//            switch status {
-//            case .readyToPlay:
-//                print("Item is ready for playback")
-//            case .failed:
-//                print("Item No longer plays due to error")
-//            case .unknown:
-//                fallthrough
-//            @unknown default:
-//                print("Item status is unknown")
-//            }
         }
     }
 }

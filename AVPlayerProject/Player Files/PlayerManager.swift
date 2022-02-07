@@ -30,11 +30,10 @@ protocol PlayerManagerObservable: AnyObject {
 
 final class PlayerManager: NSObject {
     
-    private var playerContext: Int = 0
-    
-    private var timeObserverToken: Any?
-    
     static let shared = PlayerManager()
+    
+    private var playerContext: Int = 0
+    private var timeObserverToken: Any?
     
     private let player: AVPlayer
     

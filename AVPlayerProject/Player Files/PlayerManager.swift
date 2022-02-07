@@ -19,7 +19,7 @@ enum PlayerState {
 
 protocol PlayerManagerObservable: AnyObject {
     
-    func manager(_ manager: PlayerManager, stateChangedTo state:PlayerState)
+    func manager(_ manager: PlayerManager, stateChangedTo state: PlayerState)
     
     func manager(_ manager: PlayerManager, failedToLoadResource message: String)
     

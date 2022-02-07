@@ -9,8 +9,6 @@ import Foundation
 import AVFoundation
 
 
-fileprivate class PlaybackContext {}
-
 
 enum PlayerState {
     case ready
@@ -32,7 +30,7 @@ protocol PlayerManagerObservable: AnyObject {
 
 final class PlayerManager: NSObject {
     
-    private var playerContext = PlaybackContext()
+    private var playerContext: Int = 0
     
     private var timeObserverToken: Any?
     
@@ -68,18 +66,7 @@ final class PlayerManager: NSObject {
         
         super.init()
         
-        player.addObserver(self, forKeyPath: #keyPath(AVPlayer.status), options: [.new], context: &playerContext)
-        player.addObserver(self, forKeyPath: #keyPath(AVPlayer.rate), options: [.new], context: &playerContext)
-        
-        // set up periodic time observer
-        let interval = CMTime(seconds: 0.5, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
-        let token = player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak self] cmTime in
-            guard let self = self else { return }
-            
-            self.delegate?.manager(self, didUpdatePlaybackPosition: CMTimeGetSeconds(cmTime))
-        }
-        
-        timeObserverToken = token
+        configureObservers()
     }
     
     func loadInitialResource() {
@@ -101,6 +88,21 @@ final class PlayerManager: NSObject {
     
     func pause() {
         player.pause()
+    }
+    
+    private func configureObservers() {
+        player.addObserver(self, forKeyPath: #keyPath(AVPlayer.status), options: [.new], context: &playerContext)
+        player.addObserver(self, forKeyPath: #keyPath(AVPlayer.rate), options: [.new], context: &playerContext)
+        
+        // set up periodic time observer
+        let interval = CMTime(seconds: 0.5, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
+        let token = player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak self] cmTime in
+            guard let self = self else { return }
+            
+            self.delegate?.manager(self, didUpdatePlaybackPosition: CMTimeGetSeconds(cmTime))
+        }
+        
+        timeObserverToken = token
     }
     
     // MARK: KVO
@@ -136,3 +138,9 @@ fileprivate extension PlayerManager {
         }
     }
 }
+
+/*
+ Note: I wanted to implement this with closure-based KVO but there seems to be a bug with enum's using this approach
+ https://bugs.swift.org/browse/SR-5872
+ There are some work-arounds but it seemed best to stick with the typical approach to observing with functions
+ */

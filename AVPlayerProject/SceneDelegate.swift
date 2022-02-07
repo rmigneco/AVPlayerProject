@@ -66,25 +66,29 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 extension SceneDelegate: PlayerManagerObservable {
     
-    func managerIsReadyToPlay(_ manager: PlayerManager) {
-        print("Player Manager Status: Ready")
-        manager.play()
+    func manager(_ manager: PlayerManager, stateChangedTo state: PlayerState) {
+        switch state {
+        case .ready:
+            print("^^Player Manager Status: Ready")
+            manager.play()
+        case .failed(let error):
+            print("^^Player Manager Status- Failed with Error: \(String(describing: error))")
+        case .unknown:
+            print("^^Player Manager Status: Unknown")
+        }
     }
     
-    func managerDidFail(_ manager: PlayerManager, with error: Error?) {
-        print("Player Manager Status- Failed with Error: \(String(describing: error))")
+    func manager(_ manager: PlayerManager, failedToLoadResourc message: String) {
+        print("^^Player Manager Failed To Load: \(message)")
+    }
+
+    func manager(_ manager: PlayerManager, playbackStateChangedTo isPlaying: Bool) {
+        print("^^Player Manager Plaback Status: \(isPlaying ? "Playing" : "Stopped")")
     }
     
-    func managerStatusUnknown(_ manager: PlayerManager) {
-        print("Player Manager Status: Unknown")
-    }
-    
-    func managerFailedToLoadResource(message: String) {
-        print("Player Manager Failed To Load: \(message)")
-    }
-    
-    func managerPlaybackStateChanaged(_ manager: PlayerManager, isPlaying: Bool) {
-        print("Player Manager Plaback Status: \(isPlaying ? "Playing" : "Stopped")")
+    func manager(_ manager: PlayerManager, didUpdatePlaybackPosition time: Float64) {
+        let formatted = String(format: "%.2f", time)
+        print("**Player Manager Current Time: \(formatted)")
     }
 }
 

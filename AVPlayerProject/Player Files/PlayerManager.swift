@@ -12,18 +12,30 @@ import AVFoundation
 fileprivate class PlaybackContext {}
 
 
+enum PlayerState {
+    case ready
+    case unknown
+    case failed(Error?)
+}
+
+
 protocol PlayerManagerObservable: AnyObject {
-    func managerIsReadyToPlay(_ manager: PlayerManager)
-    func managerDidFail(_ manager: PlayerManager, with error: Error?)
-    func managerStatusUnknown(_ manager: PlayerManager)
-    func managerFailedToLoadResource(message: String)
-    func managerPlaybackStateChanaged(_ manager: PlayerManager, isPlaying: Bool)
+    
+    func manager(_ manager: PlayerManager, stateChangedTo state:PlayerState)
+    
+    func manager(_ manager: PlayerManager, failedToLoadResourc message: String)
+    
+    func manager(_ manager: PlayerManager, playbackStateChangedTo isPlaying: Bool)
+    
+    func manager(_ manager: PlayerManager, didUpdatePlaybackPosition time: Float64)
 }
 
 final class PlayerManager: NSObject {
     
     private var playerItemContext = PlaybackContext()
     private var playerContext = PlaybackContext()
+    
+    private var timeObserverToken: Any?
     
     static let shared = PlayerManager()
     
@@ -35,20 +47,20 @@ final class PlayerManager: NSObject {
         didSet {
             switch playerStatus {
             case .readyToPlay:
-                delegate?.managerIsReadyToPlay(self)
+                delegate?.manager(self, stateChangedTo: .ready)
             case .failed:
-                delegate?.managerDidFail(self, with: player.error)
+                delegate?.manager(self, stateChangedTo: .failed(player.error))
             case .unknown:
                 fallthrough
             @unknown default:
-                delegate?.managerStatusUnknown(self)
+                delegate?.manager(self, stateChangedTo: .unknown)
             }
         }
     }
     
     private(set) var isPlaying: Bool = false {
         didSet {
-            delegate?.managerPlaybackStateChanaged(self, isPlaying: isPlaying)
+            delegate?.manager(self, playbackStateChangedTo: isPlaying)
         }
     }
     
@@ -59,11 +71,23 @@ final class PlayerManager: NSObject {
         
         player.addObserver(self, forKeyPath: #keyPath(AVPlayer.status), options: [.new], context: &playerContext)
         player.addObserver(self, forKeyPath: #keyPath(AVPlayer.rate), options: [.new], context: &playerContext)
+        
+        // set up periodic time observer
+        let interval = CMTime(seconds: 0.5, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
+        let token = player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak self] cmTime in
+            guard let self = self else { return }
+            
+            self.delegate?.manager(self, didUpdatePlaybackPosition: CMTimeGetSeconds(cmTime))
+        }
+        
+        timeObserverToken = token
     }
     
     func loadInitialResource() {
-        guard let url = URL(string: "https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8") else {
-            delegate?.managerFailedToLoadResource(message: "Invalid URL")
+        let urlString = "https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8"
+        guard let url = URL(string: urlString) else {
+            delegate?.manager(self, failedToLoadResourc: "Invalid URL: " + urlString)
+            
             return
         }
         

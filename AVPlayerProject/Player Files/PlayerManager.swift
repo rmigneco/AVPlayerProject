@@ -21,7 +21,7 @@ protocol PlayerManagerObservable: AnyObject {
     
     func manager(_ manager: PlayerManager, stateChangedTo state:PlayerState)
     
-    func manager(_ manager: PlayerManager, failedToLoadResourc message: String)
+    func manager(_ manager: PlayerManager, failedToLoadResource message: String)
     
     func manager(_ manager: PlayerManager, playbackStateChangedTo isPlaying: Bool)
     
@@ -72,7 +72,7 @@ final class PlayerManager: NSObject {
     func loadInitialResource() {
         let urlString = "https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8"
         guard let url = URL(string: urlString) else {
-            delegate?.manager(self, failedToLoadResourc: "Invalid URL: " + urlString)
+            delegate?.manager(self, failedToLoadResource: "Invalid URL: " + urlString)
             
             return
         }

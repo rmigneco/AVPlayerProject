@@ -78,7 +78,7 @@ extension SceneDelegate: PlayerManagerObservable {
         }
     }
     
-    func manager(_ manager: PlayerManager, failedToLoadResourc message: String) {
+    func manager(_ manager: PlayerManager, failedToLoadResource message: String) {
         print("^^Player Manager Failed To Load: \(message)")
     }
 
